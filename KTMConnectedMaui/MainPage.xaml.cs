@@ -20,8 +20,10 @@ public partial class MainPage : ContentPage
         else
         {
             StatusLabel.Text = "Connecting...";
-            await _bluetooth.ConnectAsync();
-            if (_bluetooth.IsConnected)
+            ConnectButton.IsEnabled = false;
+            
+            var connected = await _bluetooth.ConnectAsync();
+            if (connected)
             {
                 StatusLabel.Text = "Connected";
                 ConnectButton.Text = "Disconnect";
@@ -31,12 +33,18 @@ public partial class MainPage : ContentPage
                     UiContext = "guidance",
                     TurnRoad = "Ready"
                 };
-                await _bluetooth.SendAsync(obj.GetBytes(0));
+                var sent = await _bluetooth.SendAsync(obj.GetBytes(0));
+                if (!sent)
+                {
+                    StatusLabel.Text = "Connected but failed to send data";
+                }
             }
             else
             {
                 StatusLabel.Text = "Failed to connect";
             }
+            
+            ConnectButton.IsEnabled = true;
         }
     }
 }

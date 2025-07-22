@@ -1,5 +1,8 @@
 using Plugin.BLE;
 using Plugin.BLE.Abstractions.Contracts;
+using Plugin.BLE.Abstractions.Exceptions;
+using Plugin.BLE.Abstractions;
+using Plugin.BLE.Abstractions.EventArgs;
 
 namespace KTMConnectedMaui;
 
@@ -13,28 +16,64 @@ public class BluetoothManager
     {
         _adapter = CrossBluetoothLE.Current.Adapter;
     }
+    public bool IsConnected => _device != null && _device.State == DeviceState.Connected;
 
-    public bool IsConnected => _device != null && _adapter.ConnectedDevices.Contains(_device);
-
-    public async Task ConnectAsync()
+    public async Task<bool> ConnectAsync()
     {
-        var devices = await _adapter.GetSystemConnectedOrPairedDevicesAsync();
-        _device = devices.FirstOrDefault(d => d.Name?.Contains("KTM") == true || d.Name?.Contains("LC8") == true);
-        if (_device != null)
+        try
         {
-            await _adapter.ConnectToDeviceAsync(_device);
+            IDevice? foundDevice = null;
+            void OnDeviceDiscovered(object? sender, DeviceEventArgs args)
+            {
+                if (args.Device.Name?.Contains("KTM") == true || args.Device.Name?.Contains("LC8") == true)
+                {
+                    foundDevice = args.Device;
+                }
+            }
+
+            _adapter.DeviceDiscovered += OnDeviceDiscovered;
+            await _adapter.StartScanningForDevicesAsync();
+
+            _adapter.DeviceDiscovered -= OnDeviceDiscovered;
+
+            if (foundDevice != null)
+            {
+                _device = foundDevice;
+                await _adapter.ConnectToDeviceAsync(_device);
+                return IsConnected;
+            }
+            return false;
+        }
+        catch (DeviceConnectionException)
+        {
+            return false;
+        }
+        catch (Exception)
+        {
+            return false;
         }
     }
 
-    public async Task SendAsync(byte[]? data)
+    public async Task<bool> SendAsync(byte[]? data)
     {
-        if (_device == null || data == null) return;
-        var service = await _device.GetServiceAsync(_ktmUuid);
-        if (service == null) return;
-        var characteristic = (await service.GetCharacteristicsAsync()).FirstOrDefault();
-        if (characteristic != null && characteristic.CanWrite)
+        if (_device == null || data == null || !IsConnected) return false;
+        
+        try
         {
-            await characteristic.WriteAsync(data);
+            var service = await _device.GetServiceAsync(_ktmUuid);
+            if (service == null) return false;
+            
+            var characteristic = (await service.GetCharacteristicsAsync()).FirstOrDefault();
+            if (characteristic != null && characteristic.CanWrite)
+            {
+                await characteristic.WriteAsync(data);
+                return true;
+            }
+            return false;
+        }
+        catch (Exception)
+        {
+            return false;
         }
     }
 
@@ -42,8 +81,18 @@ public class BluetoothManager
     {
         if (_device != null)
         {
-            await _adapter.DisconnectDeviceAsync(_device);
-            _device = null;
+            try
+            {
+                await _adapter.DisconnectDeviceAsync(_device);
+            }
+            catch (Exception)
+            {
+                // Ignore disconnect errors
+            }
+            finally
+            {
+                _device = null;
+            }
         }
     }
 }
