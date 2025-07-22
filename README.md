@@ -46,5 +46,5 @@ This project is inspired by this [application](https://play.google.com/store/app
 ## Conctact me
 dev@guillaumepin.ch
 ## .NET MAUI Port
-A new experimental cross-platform client using .NET MAUI is available in the `KTMConnectedMaui` folder. It reimplements the original Bluetooth logic so the app can run on iOS and Android.
+A new experimental client using .NET MAUI is available in the `KTMConnectedMaui` folder. It reimplements the original Bluetooth logic and runs on iOS.
 
