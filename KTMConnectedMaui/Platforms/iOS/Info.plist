@@ -8,5 +8,9 @@
 	<string>This app needs Bluetooth access to connect to KTM devices</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.APDSoftware.KTMConntectedMaui</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+	</array>
 </dict>
 </plist>

@@ -22,6 +22,16 @@ public class BluetoothManager
     {
         try
         {
+            // Kijk eerst of er al een geschikt apparaat verbonden is
+            var connectedDevice = _adapter.ConnectedDevices
+                .FirstOrDefault(d => (d.Name?.Contains("KTM") == true || d.Name?.Contains("LC8") == true));
+            if (connectedDevice != null)
+            {
+                _device = connectedDevice;
+                return IsConnected;
+            }
+
+            // Zo niet, scan en verbind zoals voorheen
             IDevice? foundDevice = null;
             void OnDeviceDiscovered(object? sender, DeviceEventArgs args)
             {
@@ -33,7 +43,6 @@ public class BluetoothManager
 
             _adapter.DeviceDiscovered += OnDeviceDiscovered;
             await _adapter.StartScanningForDevicesAsync();
-
             _adapter.DeviceDiscovered -= OnDeviceDiscovered;
 
             if (foundDevice != null)
