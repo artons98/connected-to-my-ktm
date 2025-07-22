@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("KTMConnectedMaui")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1b1b92aec1af72de3492dd3d8439e8f7bbce6ec3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ddf3b346a396ce7bd2dd8ada3d7751377fb63f70")]
 [assembly: System.Reflection.AssemblyProductAttribute("KTMConnectedMaui")]
 [assembly: System.Reflection.AssemblyTitleAttribute("KTMConnectedMaui")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
