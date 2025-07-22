@@ -1,107 +1,84 @@
-using Plugin.BLE;
-using Plugin.BLE.Abstractions.Contracts;
-using Plugin.BLE.Abstractions.Exceptions;
-using Plugin.BLE.Abstractions;
-using Plugin.BLE.Abstractions.EventArgs;
+using InTheHand.Net.Bluetooth;
+using InTheHand.Net.Sockets;
 
 namespace KTMConnectedMaui;
 
 public class BluetoothManager
 {
-    private readonly IAdapter _adapter;
-    private IDevice? _device;
+    private BluetoothClient _client = new();
+    private BluetoothDeviceInfo? _device;
     private readonly Guid _ktmUuid = Guid.Parse("cc4c1fb3-482e-4389-bdeb-57b7aac889ae");
 
-    public BluetoothManager()
-    {
-        _adapter = CrossBluetoothLE.Current.Adapter;
-    }
-    public bool IsConnected => _device != null && _device.State == DeviceState.Connected;
+    public bool IsConnected => _client?.Connected == true;
 
     public async Task<bool> ConnectAsync()
     {
         try
         {
-            // Kijk eerst of er al een geschikt apparaat verbonden is
-            var connectedDevice = _adapter.ConnectedDevices
-                .FirstOrDefault(d => (d.Name?.Contains("KTM") == true || d.Name?.Contains("LC8") == true));
-            if (connectedDevice != null)
+            // Try paired devices first
+            foreach (var dev in _client.PairedDevices)
             {
-                _device = connectedDevice;
-                return IsConnected;
-            }
-
-            // Zo niet, scan en verbind zoals voorheen
-            IDevice? foundDevice = null;
-            void OnDeviceDiscovered(object? sender, DeviceEventArgs args)
-            {
-                if (args.Device.Name?.Contains("KTM") == true || args.Device.Name?.Contains("LC8") == true)
+                if (IsKtmDevice(dev.DeviceName))
                 {
-                    foundDevice = args.Device;
+                    _device = dev;
+                    await _client.ConnectAsync(dev.DeviceAddress, _ktmUuid);
+                    return IsConnected;
                 }
             }
 
-            _adapter.DeviceDiscovered += OnDeviceDiscovered;
-            await _adapter.StartScanningForDevicesAsync();
-            _adapter.DeviceDiscovered -= OnDeviceDiscovered;
-
-            if (foundDevice != null)
+            // If none found, perform discovery
+            var devices = await Task.Run(() => _client.DiscoverDevices());
+            foreach (var dev in devices)
             {
-                _device = foundDevice;
-                await _adapter.ConnectToDeviceAsync(_device);
-                return IsConnected;
+                if (IsKtmDevice(dev.DeviceName))
+                {
+                    _device = dev;
+                    await _client.ConnectAsync(dev.DeviceAddress, _ktmUuid);
+                    return IsConnected;
+                }
             }
             return false;
         }
-        catch (DeviceConnectionException)
+        catch
         {
             return false;
         }
-        catch (Exception)
-        {
-            return false;
-        }
+    }
+
+    private static bool IsKtmDevice(string? name)
+    {
+        if (string.IsNullOrEmpty(name)) return false;
+        return name.Contains("KTM") || name.Contains("LC8");
     }
 
     public async Task<bool> SendAsync(byte[]? data)
     {
-        if (_device == null || data == null || !IsConnected) return false;
-        
+        if (data == null || !IsConnected) return false;
         try
         {
-            var service = await _device.GetServiceAsync(_ktmUuid);
-            if (service == null) return false;
-            
-            var characteristic = (await service.GetCharacteristicsAsync()).FirstOrDefault();
-            if (characteristic != null && characteristic.CanWrite)
-            {
-                await characteristic.WriteAsync(data);
-                return true;
-            }
-            return false;
+            using var stream = _client.GetStream();
+            await stream.WriteAsync(data, 0, data.Length);
+            await stream.FlushAsync();
+            return true;
         }
-        catch (Exception)
+        catch
         {
             return false;
         }
     }
 
-    public async Task CloseAsync()
+    public Task CloseAsync()
     {
-        if (_device != null)
+        try
         {
-            try
-            {
-                await _adapter.DisconnectDeviceAsync(_device);
-            }
-            catch (Exception)
-            {
-                // Ignore disconnect errors
-            }
-            finally
-            {
-                _device = null;
-            }
+            _client.Close();
         }
+        catch
+        {
+            // ignore
+        }
+        _client = new BluetoothClient();
+        _device = null;
+        return Task.CompletedTask;
     }
 }
