@@ -414,7 +414,7 @@
         }
       }
     },
-    "net8.0-ios18.0/iossimulator-arm64": {
+    "net8.0-ios18.0/ios-arm64": {
       "Microsoft.Extensions.Configuration/8.0.0": {
         "type": "package",
         "dependencies": {
@@ -2178,7 +2178,7 @@
       "Microsoft.Maui.Controls >= 8.0.100",
       "Microsoft.Maui.Controls.Compatibility >= 8.0.100",
       "Microsoft.NET.ILLink.Tasks >= 8.0.7",
-      "Plugin.BLE >= 2.2.0"
+      "Plugin.BLE >= 3.0.0"
     ]
   },
   "packageFolders": {
@@ -2201,6 +2201,7 @@
         "net8.0-ios"
       ],
       "sources": {
+        "/usr/local/share/dotnet/library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -2213,6 +2214,11 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -2235,7 +2241,7 @@
           },
           "Plugin.BLE": {
             "target": "Package",
-            "version": "[2.2.0, )"
+            "version": "[3.0.0, )"
           }
         },
         "imports": [
@@ -2261,22 +2267,9 @@
       }
     },
     "runtimes": {
-      "iossimulator-arm64": {
+      "ios-arm64": {
         "#import": []
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "KTMConnectedMaui depends on Plugin.BLE (>= 2.2.0) but Plugin.BLE 2.2.0 was not found. An approximate best match of Plugin.BLE 3.0.0 was resolved.",
-      "libraryId": "Plugin.BLE",
-      "targetGraphs": [
-        "net8.0-ios18.0",
-        "net8.0-ios18.0/iossimulator-arm64"
-      ]
-    }
-  ]
+  }
 }

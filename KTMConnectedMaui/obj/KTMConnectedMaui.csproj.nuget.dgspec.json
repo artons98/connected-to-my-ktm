@@ -21,6 +21,7 @@
           "net8.0-ios"
         ],
         "sources": {
+          "/usr/local/share/dotnet/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -33,6 +34,11 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -55,7 +61,7 @@
             },
             "Plugin.BLE": {
               "target": "Package",
-              "version": "[2.2.0, )"
+              "version": "[3.0.0, )"
             }
           },
           "imports": [
@@ -81,7 +87,7 @@
         }
       },
       "runtimes": {
-        "iossimulator-arm64": {
+        "ios-arm64": {
           "#import": []
         }
       }

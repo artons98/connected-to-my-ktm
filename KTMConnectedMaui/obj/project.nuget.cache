@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "6T7Rv0P2oQx5lHlB098wvQ7nbH5Kc7NQLulCPIMjmPk+thINNJNrdGK6J8tK6VzKV2MQL43IcyPj1fSJOmBmig==",
+  "dgSpecHash": "1dEmRAzrEyk=",
   "success": true,
   "projectFilePath": "/Users/artonschenk/Projects/connected-to-my-ktm/KTMConnectedMaui/KTMConnectedMaui.csproj",
   "expectedPackageFiles": [
@@ -24,17 +24,5 @@
     "/Users/artonschenk/.nuget/packages/microsoft.net.illink.tasks/8.0.7/microsoft.net.illink.tasks.8.0.7.nupkg.sha512",
     "/Users/artonschenk/.nuget/packages/plugin.ble/3.0.0/plugin.ble.3.0.0.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "KTMConnectedMaui depends on Plugin.BLE (>= 2.2.0) but Plugin.BLE 2.2.0 was not found. An approximate best match of Plugin.BLE 3.0.0 was resolved.",
-      "libraryId": "Plugin.BLE",
-      "targetGraphs": [
-        "net8.0-ios18.0",
-        "net8.0-ios18.0/iossimulator-arm64"
-      ]
-    }
-  ]
+  "logs": []
 }

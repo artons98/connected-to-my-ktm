@@ -1,0 +1,1 @@
+-v --force --timestamp=none --sign EF467F66D915AD65EF1E5DFE0E48B6137C535378 --entitlements /Users/artonschenk/Projects/connected-to-my-ktm/KTMConnectedMaui/obj/Debug/net8.0-ios/ios-arm64/Entitlements.xcent /Users/artonschenk/Projects/connected-to-my-ktm/KTMConnectedMaui/bin/Debug/net8.0-ios/ios-arm64/KTMConnectedMaui.app
