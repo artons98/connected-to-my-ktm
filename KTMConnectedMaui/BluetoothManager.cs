@@ -1,47 +1,38 @@
-using InTheHand.Net.Bluetooth;
-using InTheHand.Net.Sockets;
+using ExternalAccessory;
+using Foundation;
+using System.Linq;
 
 namespace KTMConnectedMaui;
 
 public class BluetoothManager
 {
-    private BluetoothClient _client = new();
-    private BluetoothDeviceInfo? _device;
-    private readonly Guid _ktmUuid = Guid.Parse("cc4c1fb3-482e-4389-bdeb-57b7aac889ae");
+    private EASession? _session;
+    private EAAccessory? _accessory;
+    private const string MfiProtocol = "com.ktm.myride"; // replace with actual protocol if necessary
 
-    public bool IsConnected => _client?.Connected == true;
+    public bool IsConnected => _session != null && _accessory != null;
 
-    public async Task<bool> ConnectAsync()
+    public Task<bool> ConnectAsync()
     {
         try
         {
-            // Try paired devices first
-            foreach (var dev in _client.PairedDevices)
+            var manager = EAAccessoryManager.SharedAccessoryManager;
+            foreach (var accessory in manager.ConnectedAccessories)
             {
-                if (IsKtmDevice(dev.DeviceName))
+                if (IsKtmDevice(accessory.Name) && accessory.ProtocolStrings.Contains(MfiProtocol))
                 {
-                    _device = dev;
-                    await _client.ConnectAsync(dev.DeviceAddress, _ktmUuid);
-                    return IsConnected;
+                    _accessory = accessory;
+                    _session = new EASession(accessory, MfiProtocol);
+                    _session.InputStream?.Open();
+                    _session.OutputStream?.Open();
+                    return Task.FromResult(IsConnected);
                 }
             }
-
-            // If none found, perform discovery
-            var devices = await Task.Run(() => _client.DiscoverDevices());
-            foreach (var dev in devices)
-            {
-                if (IsKtmDevice(dev.DeviceName))
-                {
-                    _device = dev;
-                    await _client.ConnectAsync(dev.DeviceAddress, _ktmUuid);
-                    return IsConnected;
-                }
-            }
-            return false;
+            return Task.FromResult(false);
         }
         catch
         {
-            return false;
+            return Task.FromResult(false);
         }
     }
 
@@ -51,19 +42,17 @@ public class BluetoothManager
         return name.Contains("KTM") || name.Contains("LC8");
     }
 
-    public async Task<bool> SendAsync(byte[]? data)
+    public Task<bool> SendAsync(byte[]? data)
     {
-        if (data == null || !IsConnected) return false;
+        if (data == null || !IsConnected) return Task.FromResult(false);
         try
         {
-            using var stream = _client.GetStream();
-            await stream.WriteAsync(data, 0, data.Length);
-            await stream.FlushAsync();
-            return true;
+            var written = _session!.OutputStream.Write(data, (nint)data.Length);
+            return Task.FromResult(written == data.Length);
         }
         catch
         {
-            return false;
+            return Task.FromResult(false);
         }
     }
 
@@ -71,14 +60,15 @@ public class BluetoothManager
     {
         try
         {
-            _client.Close();
+            _session?.InputStream?.Close();
+            _session?.OutputStream?.Close();
         }
         catch
         {
             // ignore
         }
-        _client = new BluetoothClient();
-        _device = null;
+        _session = null;
+        _accessory = null;
         return Task.CompletedTask;
     }
 }
