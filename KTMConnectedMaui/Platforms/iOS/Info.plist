@@ -6,11 +6,15 @@
 	<string>This app needs Bluetooth access to connect to KTM devices</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>This app needs Bluetooth access to connect to KTM devices</string>
-	<key>CFBundleIdentifier</key>
-	<string>com.APDSoftware.KTMConntectedMaui</string>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>fetch</string>
-	</array>
+        <key>CFBundleIdentifier</key>
+        <string>com.APDSoftware.KTMConntectedMaui</string>
+        <key>UISupportedExternalAccessoryProtocols</key>
+        <array>
+                <string>com.ktm.myride</string>
+        </array>
+        <key>UIBackgroundModes</key>
+        <array>
+                <string>fetch</string>
+        </array>
 </dict>
 </plist>
