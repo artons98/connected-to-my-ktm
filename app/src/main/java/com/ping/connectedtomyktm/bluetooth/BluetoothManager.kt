@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.BluetoothSocket
 import android.content.Context
+import android.util.Log
 import com.ping.connectedtomyktm.MainActivity
 import com.ping.connectedtomyktm.entities.SendingObject
 import java.io.IOException
@@ -81,23 +82,38 @@ class BluetoothManager(context: Context) {
 
     private fun initConnection(bluetoothDevice: BluetoothDevice): Boolean {
         if (!isKtmDevice(bluetoothDevice.name)) { return false }
-        return try {
-            this.bluetoothSocket = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(this.ktmBluetoothUUID)
-            this.outputStream = this.bluetoothSocket?.outputStream
-            this.bluetoothSocket?.connect()
-            true
-        } catch (e: IOException) {
-            this.bluetoothSocket?.close()
-            this.bluetoothSocket = null
-            this.outputStream?.close()
-            this.outputStream = null
-            false
+        // The 790's service UUID isn't guaranteed on other models — the Duke 390 Gen3
+        // needed the dash's own advertised UUID (see project issue #1). Try the known
+        // one first (no regression for the 790), then fall back to whatever the device
+        // advertises. Log which UUID connects so an untested bike (e.g. the 1290 Super
+        // Duke) can be pinned down from logcat.
+        // ponytail: linear try-each; if a model needs a specific UUID, read the log and hardcode it.
+        val candidateUuids = (listOf(ktmBluetoothUUID) +
+            (bluetoothDevice.uuids?.mapNotNull { it?.uuid } ?: emptyList())).distinct()
+        for (uuid in candidateUuids) {
+            try {
+                this.bluetoothSocket = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(uuid)
+                this.outputStream = this.bluetoothSocket?.outputStream
+                this.bluetoothSocket?.connect()
+                Log.i("KTM", "Connected to '${bluetoothDevice.name}' via SPP UUID $uuid")
+                return true
+            } catch (e: IOException) {
+                this.bluetoothSocket?.close()
+                this.bluetoothSocket = null
+                this.outputStream?.close()
+                this.outputStream = null
+            }
         }
+        Log.w("KTM", "Could not open RFCOMM to '${bluetoothDevice.name}'; tried $candidateUuids")
+        return false
     }
 
-    private fun isKtmDevice(name: String): Boolean {
+    private fun isKtmDevice(name: String?): Boolean {
         // Todo: Allow to user to select the name of his motorcycle
-        return name.contains("KTM") || name.contains("LC8")
+        if (name == null) return false
+        // Case-insensitive: the 1290 dash is reported to advertise as "LC8 Dashboard",
+        // and casing varies by model, so a case-sensitive match would silently miss it.
+        return name.contains("KTM", ignoreCase = true) || name.contains("LC8", ignoreCase = true)
     }
 
     init {

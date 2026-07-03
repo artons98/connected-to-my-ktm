@@ -223,7 +223,7 @@ MonoLibrary=/usr/local/share/dotnet/packs/Microsoft.NETCore.App.Runtime.Mono.ios
 				RuntimeConfigurationFile=runtimeconfig.bin
 				SdkDevPath=/Applications/Xcode.app/Contents/Developer
 				SdkRootDirectory=/usr/local/share/dotnet/packs/Microsoft.iOS.Sdk.net8.0_18.0/18.0.8319/
-				SdkVersion=18.2
+				SdkVersion=26.2
 				SkipMarkingNSObjectsInUserAssemblies=
 				TargetArchitectures=ARM64
 				TargetFramework=.NETCoreApp,Version=v8.0,Profile=ios

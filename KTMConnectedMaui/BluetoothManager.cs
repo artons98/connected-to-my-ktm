@@ -1,67 +1,104 @@
 using ExternalAccessory;
 using Foundation;
-using System.Linq;
 
 namespace KTMConnectedMaui;
 
+// iOS can only reach the dash's Classic-BT serial channel via ExternalAccessory (MFi).
+// A session opens only if the dash advertises a protocol string that is ALSO declared
+// in Info.plist (UISupportedExternalAccessoryProtocols). KTM's real string is unknown,
+// so this class doubles as a diagnostic: DescribeAccessories() dumps every accessory
+// and its protocol strings so the real value can be captured and added to Info.plist.
 public class BluetoothManager
 {
     private EASession? _session;
     private EAAccessory? _accessory;
-    private const string MfiProtocol = "com.ktm.myride"; // replace with actual protocol if necessary
 
-    public bool IsConnected => _session != null && _accessory != null;
+    public bool IsConnected => _session != null;
+    public string? ConnectedAccessoryName => _accessory?.Name;
+    public string? ConnectedProtocol { get; private set; }
 
-    public Task<bool> ConnectAsync()
+    public static string[] DeclaredProtocols =>
+        (NSBundle.MainBundle.ObjectForInfoDictionary("UISupportedExternalAccessoryProtocols")
+            as NSArray) is { } arr
+            ? Enumerable.Range(0, (int)arr.Count).Select(i => arr.GetItem<NSString>((nuint)i).ToString()).ToArray()
+            : Array.Empty<string>();
+
+    // Diagnostic dump: every MFi accessory iOS currently sees, with its protocol strings.
+    // If the KTM dash is paired but absent here, iOS is not exposing an iAP data channel
+    // for it and the ExternalAccessory route is dead. If it IS here, the listed protocol
+    // strings are the missing puzzle piece — add them to Info.plist and rebuild.
+    public static List<string> DescribeAccessories()
     {
+        var accessories = EAAccessoryManager.SharedAccessoryManager.ConnectedAccessories;
+        if (accessories.Length == 0)
+            return new List<string> { "Geen MFi-accessoires zichtbaar. Is het dashboard gekoppeld via Instellingen > Bluetooth?" };
+        return accessories.Select(a =>
+            $"• {a.Name} ({a.Manufacturer}, model {a.ModelNumber})\n  protocollen: " +
+            (a.ProtocolStrings.Length > 0 ? string.Join(", ", a.ProtocolStrings) : "(geen)"))
+            .ToList();
+    }
+
+    // All MFi accessories iOS currently sees — no name filtering; the user picks.
+    public static EAAccessory[] Accessories =>
+        EAAccessoryManager.SharedAccessoryManager.ConnectedAccessories;
+
+    // Connects to the user-chosen accessory, on the first protocol string it shares
+    // with Info.plist. Returns a human-readable result line for the on-screen log.
+    public Task<string> ConnectAsync(EAAccessory accessory)
+    {
+        Close();
+        var protocol = accessory.ProtocolStrings.FirstOrDefault(DeclaredProtocols.Contains);
+        if (protocol == null)
+            return Task.FromResult(
+                $"'{accessory.Name}' adverteert geen gedeclareerd protocol. Gevonden: " +
+                (accessory.ProtocolStrings.Length > 0 ? string.Join(", ", accessory.ProtocolStrings) : "(geen)") +
+                " — voeg toe aan Info.plist en herbouw.");
         try
         {
-            var manager = EAAccessoryManager.SharedAccessoryManager;
-            foreach (var accessory in manager.ConnectedAccessories)
+            var session = new EASession(accessory, protocol);
+            if (session.OutputStream == null)
+                return Task.FromResult($"Sessie geweigerd voor '{accessory.Name}' ({protocol}) — vermoedelijk MFi-blokkade.");
+            session.OutputStream.Schedule(NSRunLoop.Main, NSRunLoopMode.Default);
+            session.OutputStream.Open();
+            _session = session;
+            _accessory = accessory;
+            ConnectedProtocol = protocol;
+            return Task.FromResult($"Verbonden met '{accessory.Name}' via {protocol}");
+        }
+        catch (Exception e)
+        {
+            return Task.FromResult($"Sessie naar '{accessory.Name}' ({protocol}) mislukt: {e.Message}");
+        }
+    }
+
+    public async Task<bool> SendAsync(byte[]? data)
+    {
+        if (data == null || _session?.OutputStream is not { } stream) return false;
+        int offset = 0;
+        var deadline = DateTime.UtcNow.AddSeconds(3);
+        while (offset < data.Length)
+        {
+            if (DateTime.UtcNow > deadline) return false;
+            if (!stream.HasSpaceAvailable())
             {
-                if (IsKtmDevice(accessory.Name) && accessory.ProtocolStrings.Contains(MfiProtocol))
-                {
-                    _accessory = accessory;
-                    _session = new EASession(accessory, MfiProtocol);
-                    _session.InputStream?.Open();
-                    _session.OutputStream?.Open();
-                    return Task.FromResult(IsConnected);
-                }
+                await Task.Delay(20);
+                continue;
             }
-            return Task.FromResult(false);
+            var chunk = offset == 0 ? data : data[offset..];
+            nint written = stream.Write(chunk, (nuint)chunk.Length);
+            if (written < 0) return false;
+            offset += (int)written;
         }
-        catch
-        {
-            return Task.FromResult(false);
-        }
+        return true;
     }
 
-    private static bool IsKtmDevice(string? name)
-    {
-        if (string.IsNullOrEmpty(name)) return false;
-        return name.Contains("KTM") || name.Contains("LC8");
-    }
-
-    public Task<bool> SendAsync(byte[]? data)
-    {
-        if (data == null || !IsConnected) return Task.FromResult(false);
-        try
-        {
-            var written = _session!.OutputStream.Write(data, (nint)data.Length);
-            return Task.FromResult(written == data.Length);
-        }
-        catch
-        {
-            return Task.FromResult(false);
-        }
-    }
-
-    public Task CloseAsync()
+    public void Close()
     {
         try
         {
-            _session?.InputStream?.Close();
             _session?.OutputStream?.Close();
+            _session?.OutputStream?.Unschedule(NSRunLoop.Main, NSRunLoopMode.Default);
+            _session?.InputStream?.Close();
         }
         catch
         {
@@ -69,6 +106,6 @@ public class BluetoothManager
         }
         _session = null;
         _accessory = null;
-        return Task.CompletedTask;
+        ConnectedProtocol = null;
     }
 }

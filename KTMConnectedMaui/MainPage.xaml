@@ -2,8 +2,16 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="KTMConnectedMaui.MainPage">
-    <VerticalStackLayout Spacing="25" Padding="30">
-        <Label x:Name="StatusLabel" Text="Disconnected" FontSize="18" HorizontalOptions="Center" />
-        <Button x:Name="ConnectButton" Text="Connect" Clicked="OnConnectClicked" />
-    </VerticalStackLayout>
+    <ScrollView>
+        <VerticalStackLayout Spacing="15" Padding="30">
+            <Label x:Name="StatusLabel" Text="Niet verbonden" FontSize="18" HorizontalOptions="Center" />
+            <Button x:Name="ConnectButton" Text="Verbinden" Clicked="OnConnectClicked" />
+            <Button Text="Koppel nieuw accessoire…" Clicked="OnPairNewClicked" />
+            <Button Text="Toon accessoires &amp; protocollen" Clicked="OnShowAccessoriesClicked" />
+            <Button x:Name="SimNavButton" Text="Simuleer navigatie" Clicked="OnSimulateNavigationClicked" IsEnabled="False" />
+            <Button x:Name="SimCameraButton" Text="Simuleer flitspaal" Clicked="OnSimulateSpeedCameraClicked" IsEnabled="False" />
+            <Label Text="Log" FontAttributes="Bold" />
+            <Label x:Name="LogLabel" FontSize="12" FontFamily="Courier" LineBreakMode="WordWrap" />
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

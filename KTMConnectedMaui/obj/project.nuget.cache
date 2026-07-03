@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "1dEmRAzrEyk=",
+  "dgSpecHash": "06GAbTOA7mg=",
   "success": true,
   "projectFilePath": "/Users/artonschenk/Projects/connected-to-my-ktm/KTMConnectedMaui/KTMConnectedMaui.csproj",
   "expectedPackageFiles": [
@@ -21,8 +21,7 @@
     "/Users/artonschenk/.nuget/packages/microsoft.maui.essentials/8.0.100/microsoft.maui.essentials.8.0.100.nupkg.sha512",
     "/Users/artonschenk/.nuget/packages/microsoft.maui.graphics/8.0.100/microsoft.maui.graphics.8.0.100.nupkg.sha512",
     "/Users/artonschenk/.nuget/packages/microsoft.maui.resizetizer/8.0.100/microsoft.maui.resizetizer.8.0.100.nupkg.sha512",
-    "/Users/artonschenk/.nuget/packages/microsoft.net.illink.tasks/8.0.7/microsoft.net.illink.tasks.8.0.7.nupkg.sha512",
-    "/Users/artonschenk/.nuget/packages/plugin.ble/3.0.0/plugin.ble.3.0.0.nupkg.sha512"
+    "/Users/artonschenk/.nuget/packages/microsoft.net.illink.tasks/8.0.7/microsoft.net.illink.tasks.8.0.7.nupkg.sha512"
   ],
   "logs": []
 }

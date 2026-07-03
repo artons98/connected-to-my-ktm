@@ -58,10 +58,6 @@
               "target": "Package",
               "version": "[8.0.7, )",
               "autoReferenced": true
-            },
-            "Plugin.BLE": {
-              "target": "Package",
-              "version": "[3.0.0, )"
             }
           },
           "imports": [

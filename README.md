@@ -9,6 +9,14 @@ This project is completely open-source and does not contain any [**Anti-Features
 | Model | Year | compatible |
 | --- | --- | --- |
 | Ktm 790 adventure R | 2019 | ✅ |
+| Ktm 1290 Super Duke R | 2021 | ⚠️ untested — same Bosch LC8 dashboard family, *probably* works; see [protocol notes](docs/KTM-MY-RIDE-PROTOCOL.md) |
+
+> **KTM MY RIDE must be activated on the bike.** On many models (incl. the 1290 Super Duke R)
+> it is an optional feature needing the connectivity control unit and a dealer/menu unlock
+> before Bluetooth pairing is available. See the [protocol notes](docs/KTM-MY-RIDE-PROTOCOL.md).
+
+> **Android only.** iOS cannot talk to the dashboard's serial channel without Apple MFi
+> certification, so a custom iOS/MAUI app cannot connect — see the [protocol notes](docs/KTM-MY-RIDE-PROTOCOL.md#0-tldr--the-two-decisions-that-shape-the-whole-project).
 
 ## Application compatible
 | Application | Version | compatible |
@@ -45,6 +53,15 @@ This project is inspired by this [application](https://play.google.com/store/app
 
 ## Conctact me
 dev@guillaumepin.ch
-## .NET MAUI Port
-A new experimental client using .NET MAUI is available in the `KTMConnectedMaui` folder. It reimplements the original Bluetooth logic and runs on iOS.
+## .NET MAUI / iOS port — diagnostic test app (connection unproven)
+The `KTMConnectedMaui` folder is an iOS test app. iOS only reaches Classic-Bluetooth serial
+devices through Apple's ExternalAccessory/MFi framework; Core Bluetooth (BLE) cannot see the
+RFCOMM/SPP channel at all. App Store distribution would require MFi whitelisting, but a
+**sideloaded dev build** may open a session *if* the dash advertises an iAP protocol string
+declared in `Info.plist` — and KTM's real string is unknown. The app therefore doubles as a
+probe: "Toon accessoires & protocollen" dumps every MFi accessory iOS sees with its protocol
+strings. If the dash shows up, add its strings to `Info.plist`, rebuild, connect, and use the
+"Simuleer navigatie" / "Simuleer flitspaal" buttons to test rendering on the dash. If the
+dash never appears there, the iOS route is definitively closed — use the Android app.
+Full reasoning in the [protocol notes](docs/KTM-MY-RIDE-PROTOCOL.md#0-tldr--the-two-decisions-that-shape-the-whole-project).
 

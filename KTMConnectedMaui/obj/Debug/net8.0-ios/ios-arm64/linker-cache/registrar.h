@@ -16,7 +16,6 @@
 #import <CoreLocation/CoreLocation.h>
 #import <SafariServices/SafariServices.h>
 #import <ContactsUI/ContactsUI.h>
-#import <CoreBluetooth/CoreBluetooth.h>
 #import <VisionKit/VisionKit.h>
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import <ThreadNetwork/THClient.h>
@@ -113,6 +112,7 @@
 #import <CoreImage/CoreImage.h>
 #import <CoreImage/CIFilterBuiltins.h>
 #import <CoreData/CoreData.h>
+#import <CoreBluetooth/CoreBluetooth.h>
 #import <Contacts/Contacts.h>
 #import <CloudKit/CloudKit.h>
 #import <ClassKit/ClassKit.h>
@@ -441,8 +441,6 @@
 @class Microsoft_iOS__ContactsUI_CNContactPickerDelegate;
 @class Microsoft_Maui_ApplicationModel_Communication_ContactsImplementation_ContactPickerDelegate;
 @class Microsoft_Maui_ApplicationModel_Permissions_LocationWhenInUse_ManagerDelegate;
-@class Microsoft_iOS__CoreBluetooth_CBCentralManagerDelegate;
-@class Plugin_BLE_BleCentralManagerDelegate;
 @class Microsoft_iOS__VisionKit_VNDocumentCameraViewControllerDelegate;
 @class Microsoft_iOS__WatchConnectivity_WCSessionDelegate;
 @class Microsoft_iOS__ShazamKit_SHSessionDelegate;
@@ -889,6 +887,7 @@
 @class CoreImage_CIZoomBlur;
 @class Microsoft_iOS__CoreData_NSFetchedResultsControllerDelegate;
 @class Microsoft_iOS__CoreData_NSFetchedResultsSectionInfo;
+@class Microsoft_iOS__CoreBluetooth_CBCentralManagerDelegate;
 @class Microsoft_iOS__CoreBluetooth_CBPeripheralDelegate;
 @class Microsoft_iOS__CoreBluetooth_CBPeripheralManagerDelegate;
 @class Microsoft_iOS__CoreAnimation_CALayerDelegate;
@@ -3147,29 +3146,6 @@
 
 @interface Microsoft_iOS__ContactsUI_CNContactPickerDelegate : NSObject<CNContactPickerDelegate> {
 }
-	-(id) init;
-@end
-
-@interface Microsoft_iOS__CoreBluetooth_CBCentralManagerDelegate : NSObject<CBCentralManagerDelegate> {
-}
-	-(id) init;
-@end
-
-@interface Plugin_BLE_BleCentralManagerDelegate : NSObject<CBCentralManagerDelegate> {
-}
-	-(void) release;
-	-(id) retain;
-	-(GCHandle) xamarinGetGCHandle;
-	-(bool) xamarinSetGCHandle: (GCHandle) gchandle flags: (enum XamarinGCHandleFlags) flags;
-	-(enum XamarinGCHandleFlags) xamarinGetFlags;
-	-(void) xamarinSetFlags: (enum XamarinGCHandleFlags) flags;
-	-(void) centralManager:(CBCentralManager *)p0 willRestoreState:(NSDictionary *)p1;
-	-(void) centralManager:(CBCentralManager *)p0 didFailToConnectPeripheral:(CBPeripheral *)p1 error:(NSError *)p2;
-	-(void) centralManager:(CBCentralManager *)p0 didDiscoverPeripheral:(CBPeripheral *)p1 advertisementData:(NSDictionary *)p2 RSSI:(NSNumber *)p3;
-	-(void) centralManager:(CBCentralManager *)p0 didDisconnectPeripheral:(CBPeripheral *)p1 error:(NSError *)p2;
-	-(void) centralManagerDidUpdateState:(CBCentralManager *)p0;
-	-(void) centralManager:(CBCentralManager *)p0 didConnectPeripheral:(CBPeripheral *)p1;
-	-(BOOL) conformsToProtocol:(void *)p0;
 	-(id) init;
 @end
 
@@ -8107,6 +8083,11 @@
 @end
 
 @interface Microsoft_iOS__CoreData_NSFetchedResultsSectionInfo : NSObject<NSFetchedResultsSectionInfo> {
+}
+	-(id) init;
+@end
+
+@interface Microsoft_iOS__CoreBluetooth_CBCentralManagerDelegate : NSObject<CBCentralManagerDelegate> {
 }
 	-(id) init;
 @end

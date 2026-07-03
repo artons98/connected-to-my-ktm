@@ -48,7 +48,6 @@
 /Users/artonschenk/Projects/connected-to-my-ktm/KTMConnectedMaui/bin/Debug/net8.0-ios/ios-arm64/publish/../KTMConnectedMaui.app/Microsoft.Maui.dll
 /Users/artonschenk/Projects/connected-to-my-ktm/KTMConnectedMaui/bin/Debug/net8.0-ios/ios-arm64/publish/../KTMConnectedMaui.app/Microsoft.Maui.Essentials.dll
 /Users/artonschenk/Projects/connected-to-my-ktm/KTMConnectedMaui/bin/Debug/net8.0-ios/ios-arm64/publish/../KTMConnectedMaui.app/Microsoft.Maui.Graphics.dll
-/Users/artonschenk/Projects/connected-to-my-ktm/KTMConnectedMaui/bin/Debug/net8.0-ios/ios-arm64/publish/../KTMConnectedMaui.app/Plugin.BLE.dll
 /Users/artonschenk/Projects/connected-to-my-ktm/KTMConnectedMaui/bin/Debug/net8.0-ios/ios-arm64/publish/../KTMConnectedMaui.app/KTMConnectedMaui.dll
 /Users/artonschenk/Projects/connected-to-my-ktm/KTMConnectedMaui/bin/Debug/net8.0-ios/ios-arm64/publish/../KTMConnectedMaui.app/Microsoft.CSharp.dll
 /Users/artonschenk/Projects/connected-to-my-ktm/KTMConnectedMaui/bin/Debug/net8.0-ios/ios-arm64/publish/../KTMConnectedMaui.app/Microsoft.VisualBasic.Core.dll

@@ -16,6 +16,11 @@ public class SendingObject
     public string GpsIcon { get; set; } = "GPS";
     public string UiContext { get; set; } = "default";
 
+    // OEM MsgId prefixes (from the decompiled official app): Restore, gon, goff,
+    // mup (maneuver update), lup (location update), gps, gpsoff, re (rerouting).
+    // Null = derive from UiContext like the proven Android client does.
+    public string? MsgIdPrefix { get; set; }
+
     private static JsonElement BuildIconJson(string? value)
     {
         var json = new { Image = value ?? "UNDEFINED", Visibility = value != null ? "full" : "off" };
@@ -46,7 +51,7 @@ public class SendingObject
                 ["NotificationText"] = BuildTextJson(NotificationText),
                 ["NotificationIcon"] = new { Visibility = "off" }
             },
-            ["MsgId"] = UiContext == "guidance" ? "gon" : "Restore"
+            ["MsgId"] = MsgIdPrefix ?? (UiContext == "guidance" ? "gon" : "Restore")
         };
         return JsonSerializer.Serialize(obj).Replace("\\/", "/");
     }

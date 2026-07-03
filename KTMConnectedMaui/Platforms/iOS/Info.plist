@@ -8,13 +8,19 @@
 	<string>This app needs Bluetooth access to connect to KTM devices</string>
         <key>CFBundleIdentifier</key>
         <string>com.APDSoftware.KTMConntectedMaui</string>
+        <!-- KTM's real iAP protocol string is unknown; these are guesses. The app's
+             "Toon accessoires" button dumps what the dash actually advertises —
+             add that value here and rebuild. -->
         <key>UISupportedExternalAccessoryProtocols</key>
         <array>
                 <string>com.ktm.myride</string>
+                <string>com.ktm.navapp</string>
+                <string>com.ktm.kmrc</string>
+                <string>com.ktm.myride.navigation</string>
         </array>
         <key>UIBackgroundModes</key>
         <array>
-                <string>fetch</string>
+                <string>external-accessory</string>
         </array>
 </dict>
 </plist>
